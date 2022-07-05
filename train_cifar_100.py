@@ -124,7 +124,7 @@ class Trainer:
         return self.loss_train_epoch, self.epoch_auc_history
 
     def create_dir(self):
-        ex_path = os.path.join(cfg.cifar10['experiments_path'], str(self.ex_num), self.config['name'])
+        ex_path = os.path.join(cfg.cifar100['experiments_path'], str(self.ex_num), self.config['name'])
         os.makedirs(ex_path)
         os.makedirs(os.path.join(ex_path, 'ckpt'))
         os.makedirs(os.path.join(ex_path, 'results'))
@@ -137,13 +137,13 @@ if __name__ == '__main__':
     # Plot #####################################
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 
-    if not os.path.exists(cfg.cifar10['experiments_path']):
-        os.makedirs(cfg.cifar10['experiments_path'])
-    ex_num = len(os.listdir(cfg.cifar10['experiments_path']))
+    if not os.path.exists(cfg.cifar100['experiments_path']):
+        os.makedirs(cfg.cifar100['experiments_path'])
+    ex_num = len(os.listdir(cfg.cifar100['experiments_path']))
 
     for backbone in backbone_list:
         if backbone == 'ResNet18':
-            model = ResNet18.ResNet18(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = ResNet18.ResNet18(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet18['lr'])
 
@@ -159,15 +159,15 @@ if __name__ == '__main__':
             axs[0].plot(loss_train_epoch, label=cfg.resnet18['name'])
             axs[0].set_xlabel('Epoch')
             axs[0].set_ylabel('Loss')
-            axs[0].set_title('Loss-Cifar10')
+            axs[0].set_title('Loss-Cifar100')
             axs[1].plot(epoch_auc_history, label=cfg.resnet18['name'])
-            axs[1].set_title('Accuracy-Cifar10')
+            axs[1].set_title('Accuracy-Cifar100')
             axs[1].set_xlabel('Epoch')
             axs[1].set_ylabel('Accuracy')
             del model, train
 
         elif backbone == 'ResNet50':
-            model = ResNet50.ResNet50(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = ResNet50.ResNet50(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet50['lr'])
 
@@ -184,7 +184,7 @@ if __name__ == '__main__':
             axs[1].plot(epoch_auc_history, label=cfg.resnet50['name'])
 
         elif backbone == 'ResNet101':
-            model = ResNet101.ResNet101(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = ResNet101.ResNet101(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet101['lr'])
 
@@ -201,7 +201,7 @@ if __name__ == '__main__':
             axs[1].plot(epoch_auc_history, label=cfg.resnet101['name'])
 
         elif backbone == 'MobileNetV2':
-            model = MobileNetV2.MobileNetV2(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = MobileNetV2.MobileNetV2(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.mobilenetv2['lr'])
 
@@ -218,7 +218,7 @@ if __name__ == '__main__':
             axs[1].plot(epoch_auc_history, label=cfg.mobilenetv2['name'])
 
         elif backbone == 'EfficientNetV2':
-            model = EfficientNetV2.EfficientnetV2(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = EfficientNetV2.EfficientnetV2(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.efficientnetv2['lr'])
 
@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
 
         elif backbone == 'VGG19':
-            model = VGG19.Vgg19(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = VGG19.Vgg19(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.vgg19['lr'])
 
@@ -253,5 +253,5 @@ if __name__ == '__main__':
             axs[1].plot(epoch_auc_history, label=cfg.vgg19['name'])
             axs[0].legend(loc="upper right")
             axs[1].legend(loc="upper right")
-            fig.savefig(os.path.join(cfg.cifar10['experiments_path'], str(ex_num), 'all.png'))
+            fig.savefig(os.path.join(cfg.cifar100['experiments_path'], str(ex_num), 'all.png'))
             del model, train
