@@ -51,6 +51,7 @@ class Trainer:
         self.loss_train_batch = []
         self.ckpt_path, self.results_path = self.create_dir()
 
+
     def train_step(self):
         self.model.train()
         epoch_loss = []
