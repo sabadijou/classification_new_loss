@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from configs import imagenet as cfg
 from utils.gpu import device
 from backbones import ResNet18, ResNet50, ResNet101, MobileNetV2, EfficientNetV2, VGG19
+from utils.transformers import imagenet_transformer_train, imagenet_transformer_val
 from utils.visualize_results import Visualize
 import os
 
@@ -26,9 +27,11 @@ class Trainer:
         self.scheduler = scheduler
         self.ex_num = ex_num
         self.train_dataset = torchvision.datasets.ImageNet(root=cfg.imagenet['train_data_path'],
-                                                           split='train')
+                                                           split='train',
+                                                           transform=imagenet_transformer_train())
         self.test_dataset = torchvision.datasets.ImageNet(root=cfg.imagenet['val_data_path'],
-                                                          split='val')
+                                                          split='val',
+                                                          transform=imagenet_transformer_val())
 
         self.train_loader = torch.utils.data.DataLoader(self.train_dataset,
                                                         batch_size=self.config['train_batch_size'],
@@ -121,6 +124,10 @@ class Trainer:
 
 
 if __name__ == '__main__':
+    torch.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
     backbone_list = ['ResNet18', 'ResNet50', 'ResNet101', 'MobileNetV2', 'EfficientNetV2', 'VGG19']
     _loss = choose_loss('ourloss', gamma=2)
     # Plot #####################################

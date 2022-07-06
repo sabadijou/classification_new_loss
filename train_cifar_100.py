@@ -132,6 +132,11 @@ class Trainer:
 
 
 if __name__ == '__main__':
+    torch.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     backbone_list = ['ResNet18', 'ResNet50', 'ResNet101', 'MobileNetV2', 'EfficientNetV2', 'VGG19']
     _loss = choose_loss('ourloss', gamma=2)
     # Plot #####################################
