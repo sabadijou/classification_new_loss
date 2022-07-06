@@ -6,7 +6,7 @@ from utils.losses import choose_loss
 import matplotlib.pyplot as plt
 from configs import imagenet as cfg
 from utils.gpu import device
-from backbones import ResNet18, ResNet50, ResNet101, MobileNetV2, EfficientNetV2, VGG19
+from backbones import ResNet18, ResNet50, ResNet101, MobileNetV2, EfficientNetV2, VGG19, SwinTransformer
 from utils.transformers import imagenet_transformer_train, imagenet_transformer_val
 from utils.visualize_results import Visualize
 import os
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(0)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    backbone_list = ['ResNet18', 'ResNet50', 'ResNet101', 'MobileNetV2', 'EfficientNetV2', 'VGG19']
+    backbone_list = ['ResNet18', 'ResNet50', 'ResNet101', 'MobileNetV2', 'EfficientNetV2', 'SwinTransformer', 'VGG19']
     _loss = choose_loss('ourloss', gamma=2)
     # Plot #####################################
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
@@ -229,6 +229,23 @@ if __name__ == '__main__':
             loss_train_epoch, epoch_auc_history = train.run()
             axs[0].plot(loss_train_epoch, label=cfg.efficientnetv2['name'])
             axs[1].plot(epoch_auc_history, label=cfg.efficientnetv2['name'])
+
+        elif backbone == 'SwinTransformer':
+            model = SwinTransformer.SwinTransformer(class_num=cfg.imagenet['class_num'], pretrained=True)
+            model.to(device)
+            optimizer = optim.Adadelta(model.parameters(), lr=cfg.swintransformer['lr'])
+
+            scheduler = StepLR(optimizer, step_size=1, gamma=cfg.swintransformer['scheduler_gamma'])
+
+            train = Trainer(model=model,
+                            optimizer=optimizer,
+                            scheduler=scheduler,
+                            loss_function=_loss,
+                            config=cfg.swintransformer,
+                            ex_num=ex_num)
+            loss_train_epoch, epoch_auc_history = train.run()
+            axs[0].plot(loss_train_epoch, label=cfg.swintransformer['name'])
+            axs[1].plot(epoch_auc_history, label=cfg.swintransformer['name'])
 
 
         elif backbone == 'VGG19':

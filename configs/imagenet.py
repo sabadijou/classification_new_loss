@@ -116,3 +116,21 @@ vgg19 = {
             'log_interval': 1,
             'scheduler_gamma': 0.7
             }
+
+swintransformer = {
+            'name': 'swintransformer',
+            'dataset_name': 'imagenet',
+            'train_batch_size': 64,
+            'test_batch_size': 64,
+            'num_workers': 1,
+            'pin_memory': True,
+            'shuffle': True,
+            'dry_run': False,
+            'gamma': 2,
+            'epoch': 3,
+            'lr': 1,
+            'seed': 0,
+            'seed_type': int,
+            'log_interval': 1,
+            'scheduler_gamma': 0.7
+            }
