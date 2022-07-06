@@ -1,3 +1,5 @@
+import numpy
+import torch
 from torchvision import transforms
 
 
@@ -8,9 +10,18 @@ def cifar10_transformer():
     return transform
 
 
-def cifar100_transformer():
-    pass
+def imagenet_transformer_train():
+    transform = transforms.Compose([
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    return transform
 
-
-def imagenet_transformer():
-    pass
+def imagenet_transformer_val():
+    transform = transforms.Compose([
+        transforms.Resize(size=(224, 224)),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    return transform
