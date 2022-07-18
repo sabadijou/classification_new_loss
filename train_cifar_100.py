@@ -150,7 +150,10 @@ if __name__ == '__main__':
         if backbone == 'ResNet18':
             model = ResNet18.ResNet18(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
-            optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet18['lr'])
+            optimizer = optim.SGD(model.parameters(),
+                                  lr=cfg.resnet18['lr'],
+                                  momentum=0.9,
+                                  weight_decay=cfg.resnet18['weight_decay'])
 
             scheduler = StepLR(optimizer, step_size=1, gamma=cfg.resnet18['scheduler_gamma'])
 
@@ -174,7 +177,9 @@ if __name__ == '__main__':
         elif backbone == 'ResNet50':
             model = ResNet50.ResNet50(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
-            optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet50['lr'])
+            optimizer = optim.Adam(model.parameters(),
+                                   lr=cfg.resnet50['lr'],
+                                   weight_decay=cfg.resnet50['weight_decay'])
 
             scheduler = StepLR(optimizer, step_size=1, gamma=cfg.resnet50['scheduler_gamma'])
 
@@ -191,7 +196,10 @@ if __name__ == '__main__':
         elif backbone == 'ResNet101':
             model = ResNet101.ResNet101(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
-            optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet101['lr'])
+            optimizer = optim.SGD(model.parameters(),
+                                  lr=cfg.resnet18['lr'],
+                                  momentum=0.9,
+                                  weight_decay=cfg.resnet101['weight_decay'])
 
             scheduler = StepLR(optimizer, step_size=1, gamma=cfg.resnet101['scheduler_gamma'])
 
@@ -208,7 +216,10 @@ if __name__ == '__main__':
         elif backbone == 'MobileNetV2':
             model = MobileNetV2.MobileNetV2(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
-            optimizer = optim.Adadelta(model.parameters(), lr=cfg.mobilenetv2['lr'])
+            optimizer = torch.optim.RMSprop(model.parameters(),
+                                            lr=cfg.mobilenetv2['lr'],
+                                            momentum=0.9,
+                                            weight_decay=cfg.mobilenetv2['weight_decay'])
 
             scheduler = StepLR(optimizer, step_size=1, gamma=cfg.mobilenetv2['scheduler_gamma'])
 
@@ -225,7 +236,10 @@ if __name__ == '__main__':
         elif backbone == 'EfficientNetV2':
             model = EfficientNetV2.EfficientnetV2(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
-            optimizer = optim.Adadelta(model.parameters(), lr=cfg.efficientnetv2['lr'])
+            optimizer = optim.SGD(model.parameters(),
+                                  lr=cfg.efficientnetv2['lr'],
+                                  momentum=0.9,
+                                  weight_decay=cfg.efficientnetv2['weight_decay'])
 
             scheduler = StepLR(optimizer, step_size=1, gamma=cfg.efficientnetv2['scheduler_gamma'])
 
@@ -243,7 +257,10 @@ if __name__ == '__main__':
         elif backbone == 'VGG19':
             model = VGG19.Vgg19(class_num=cfg.cifar100['class_num'], pretrained=False)
             model.to(device)
-            optimizer = optim.Adadelta(model.parameters(), lr=cfg.vgg19['lr'])
+            optimizer = optim.SGD(model.parameters(),
+                                  lr=cfg.vgg19['lr'],
+                                  momentum=0.9,
+                                  weight_decay=cfg.vgg19['weight_decay'])
 
             scheduler = StepLR(optimizer, step_size=1, gamma=cfg.vgg19['scheduler_gamma'])
 
