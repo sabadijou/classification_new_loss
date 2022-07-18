@@ -1,9 +1,9 @@
 import os
 import cv2
 import torch
-from torchvision.transforms import transforms
 import _pickle as cPickle
-from utils.gpu import device
+from torchvision.transforms import transforms
+
 
 class ImTrainloader(torch.utils.data.Dataset):
     def __init__(self, data_path, **kwargs):
@@ -13,8 +13,15 @@ class ImTrainloader(torch.utils.data.Dataset):
         self.cats = os.listdir(self.data_path)
         self.all_images = self.load_all_idx()
         self.meta_label = self.load_meta()
+        self.all_samples = self.put_down_ram()
         self.transform = transforms.Compose([transforms.ToTensor(),
                                              transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    def put_down_ram(self):
+        img_list = []
+        for item in self.all_images:
+            img_list.append(cv2.imread(item))
+        return img_list
 
     def load_meta(self):
         f = open(os.path.join(self.main_path, 'batches.meta'), 'rb')
@@ -33,16 +40,11 @@ class ImTrainloader(torch.utils.data.Dataset):
         return idx_list
 
     def __getitem__(self, idx):
-        img = cv2.imread(self.all_images[idx])
+        img = self.all_samples[idx]
         img = self.transform(img)
-        # label = torch.zeros(size=(1,), dtype=torch.float)
         label = self.meta_label[os.path.split(os.path.split(self.all_images[idx])[0])[1]]
         return img, label
 
     def __len__(self):
         return len(self.all_images)
 
-# a = ImTrainloader(r'D:\cifar10\cifar10_imbalance')
-#
-# # print(a.meta_label)
-# a.__getitem__(15000)

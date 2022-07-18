@@ -47,7 +47,6 @@ class Trainer:
             data, target = data.to(device), target.to(device)
             self.optimizer.zero_grad()
             output = self.model(data)
-
             loss = self.loss_function(output, target)
             self.loss_train_batch.append(loss.item())
             epoch_loss.append(loss.item())
