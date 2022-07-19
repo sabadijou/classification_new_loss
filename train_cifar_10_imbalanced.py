@@ -1,6 +1,6 @@
 import torch
 # from torchvision import datasets
-from dataloader.imbalanced_dataset import ImTrainloader
+from dataloader.imbalanced_dataset import ImTrainloader, ImTestloader
 from utils.transformers import cifar10_transformer
 from torch import optim
 from torch.optim.lr_scheduler import StepLR
@@ -11,6 +11,10 @@ from utils.gpu import device
 from backbones import ResNet18, ResNet50, ResNet101, MobileNetV2, EfficientNetV2, VGG19
 from utils.visualize_results import Visualize
 import os
+from collections import Counter
+import pandas as pd
+import numpy as np
+import seaborn as sns
 
 
 class Trainer:
@@ -24,13 +28,21 @@ class Trainer:
         super(Trainer, self).__init__()
         self.model = model
         self.optimizer = optimizer
+        self.nb_classes = 10
         self.config = config
         self.scheduler = scheduler
         self.ex_num = ex_num
         self.train_loader = self.set_dataloader(ImTrainloader(data_path=r'D:\cifar10\cifar10_imbalance'))
 
-        self.test_loader = self.set_dataloader(ImTrainloader(data_path=r'D:\cifar10\cifar10_imbalance'))
-
+        self.test_loader = self.set_dataloader(ImTestloader(data_path=r'D:\cifar10\cifar10_imbalance'))
+        #############################################################################################
+        image_batches, label_batches = zip (*[batch for batch in self.train_loader])
+        lbl_bchs_lst = torch.stack (list (label_batches[:-1]), dim=0)
+        btch_size = len (lbl_bchs_lst[0])
+        data_lst = (lbl_bchs_lst.reshape ([1, btch_size * len (lbl_bchs_lst)])).squeeze ().tolist ()
+        weigths_dict = dict ((k, 1 - v / sum (Counter (data_lst).values ())) for (k, v) in Counter (data_lst).items ())
+        self.weights_tensor = torch.round (torch.Tensor (list (dict (sorted (weigths_dict.items ())).values ()))).repeat ([btch_size, 1])
+        #############################################################################################
         self.loss_function = loss_function
         self.epoch = 0
         self.best_auc = 0
@@ -47,7 +59,7 @@ class Trainer:
             data, target = data.to(device), target.to(device)
             self.optimizer.zero_grad()
             output = self.model(data)
-            loss = self.loss_function(output, target)
+            loss = self.loss_function(output, target, self.weights_tensor)
             self.loss_train_batch.append(loss.item())
             epoch_loss.append(loss.item())
             loss.backward()
@@ -65,11 +77,19 @@ class Trainer:
         self.model.eval()
         test_loss_list = []
         correct = 0
+        confusion_matrix = np.zeros ((self.nb_classes, self.nb_classes))
         with torch.no_grad():
             for data, target in self.test_loader:
                 data, target = data.to(device), target.to(device)
                 output = self.model(data)
-                test_loss_list.append(self.loss_function(output, target).item())  # sum up batch loss
+
+                # conf mat #############
+                _, preds = torch.max(output, 1)
+                for t, p in zip (target.view (-1), preds.view (-1)):
+                    confusion_matrix[t.long (), p.long ()] += 1
+                # conf mat ############
+
+                test_loss_list.append(self.loss_function(output, target, self.weights_tensor).item())  # sum up batch loss
                 pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
                 correct += pred.eq(target.view_as(pred)).sum().item()
 
@@ -85,6 +105,16 @@ class Trainer:
             100. * correct / len(self.test_loader.dataset)))
 
         print('Best Accuracy :', self.best_auc)
+
+        plt.figure(figsize=(15, 10))
+        class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+        df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names).astype(int)
+        heatmap = sns.heatmap(df_cm, annot=True, fmt="d")
+        heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=15)
+        heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right', fontsize=15)
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+        plt.savefig(os.path.join(self.results_path, 'confusion_matrix_epoch_{}.png'.format(str(self.epoch))))
 
     def set_dataloader(self, dataset, train=True):
         cuda_kwargs = {'num_workers': self.config['num_workers'],
@@ -133,7 +163,7 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
 
     backbone_list = ['ResNet18', 'ResNet50', 'ResNet101', 'MobileNetV2', 'EfficientNetV2', 'VGG19']
-    _loss = choose_loss('ourloss', gamma=2)
+    _loss = choose_loss('ourLoss_weighted', gamma=2)
     # Plot #####################################
     fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 
