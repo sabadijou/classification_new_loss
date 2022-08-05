@@ -147,3 +147,4 @@ def choose_loss(loss_type='ourloss', gamma=2):
         loss = FocalLoss(gamma=gamma, reduction='mean')
         return loss
 
+

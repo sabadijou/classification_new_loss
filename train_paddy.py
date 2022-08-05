@@ -1,9 +1,7 @@
 import torch
-from utils.transformers import cifar10_transformer
 from torch import optim
 from torch.optim.lr_scheduler import StepLR
 from utils.losses import choose_loss
-import matplotlib.pyplot as plt
 from configs import paddy_config as cfg
 from utils.gpu import device
 from backbones import RegNet
@@ -148,7 +146,7 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(0)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    _loss = choose_loss('ourloss', gamma=2)
+    _loss = choose_loss('focal_loss', gamma=2)
     # Plot #####################################
     if not os.path.exists(cfg.paddy['experiments_path']):
         os.makedirs(cfg.paddy['experiments_path'])

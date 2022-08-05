@@ -1,8 +1,8 @@
 import os
 import torch
 from PIL import Image
-import numpy as np
 from utils.transformers import imagenet_transformer_train
+
 
 class PaddyDataLoader(torch.utils.data.Dataset):
     def __init__(self, data_path, **kwargs):

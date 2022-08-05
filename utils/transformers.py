@@ -12,7 +12,7 @@ def cifar10_transformer():
 
 def imagenet_transformer_train():
     transform = transforms.Compose([
-        transforms.RandomResizedCrop(32),
+        transforms.RandomResizedCrop(128),
         transforms.RandomHorizontalFlip(),
         transforms.CenterCrop(10),
         transforms.ColorJitter(contrast=1.2),
