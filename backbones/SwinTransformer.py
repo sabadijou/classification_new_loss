@@ -1,3 +1,5 @@
+import torch
+
 from utils.gpu import device
 import torch.nn as nn
 import timm
