@@ -7,7 +7,7 @@ from utils.losses import choose_loss
 import matplotlib.pyplot as plt
 from configs import cifar10 as cfg
 from utils.gpu import device
-from backbones import ResNet18, ResNet50, ResNet101, MobileNetV2, EfficientNetV2, VGG19
+from backbones import ResNet18, ResNet50, ResNet101, MobileNetV2, EfficientNetV2, VGG19, RegNet
 from utils.visualize_results import Visualize
 import os
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
 
     for backbone in backbone_list:
         if backbone == 'ResNet18':
-            model = ResNet18.ResNet18(class_num=cfg.cifar10['class_num'], pretrained=False)
+            model = RegNet.Regnet(class_num=cfg.cifar10['class_num'], pretrained=True)
             model.to(device)
             optimizer = optim.Adadelta(model.parameters(), lr=cfg.resnet18['lr'])
 

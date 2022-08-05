@@ -7,9 +7,9 @@ cifar10 = {
 resnet18 = {
             'name': 'resnet18',
             'dataset_name': 'Cifar10',
-            'train_batch_size': 64,
+            'train_batch_size': 128,
             'test_batch_size': 64,
-            'num_workers': 2,
+            'num_workers': 1,
             'pin_memory': True,
             'shuffle': True,
             'dry_run': False,
